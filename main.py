@@ -1,7 +1,8 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, CallbackContext
-from tinydb import TinyDB
+from tinydb import TinyDB, Query
 import os
+
 
 
 like_count = 0
@@ -43,15 +44,14 @@ def query(update: Update, context: CallbackContext):
     query.message.edit_reply_markup(reply_markup=reply_markup)
     print(data, chat_id)
 
+
     db = TinyDB('db.json', indent = 4)
+    User = Query()
+    new_response = db.search(User.chat_id == chat_id)
 
-    db.insert(
-        {
-            'chat_id': chat_id,
-            'data': data
-        }
-    )
-
+    if not new_response:
+        db.insert({"chat_id": chat_id, "data": data})
+   
 
 TOKEN = os.getenv("TOKEN")
 updater = Updater(TOKEN) 
